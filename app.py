@@ -12,14 +12,30 @@ streamlit_style = """
 			</style>
 			"""
 st.markdown(streamlit_style, unsafe_allow_html=True)
-
+"""
 def fetch_poster(movie_id):
     url = "https://api.themoviedb.org/3/movie/{}?api_key=b029056b23ab082b8613c7aec5ecb0ec&language=en-US".format(movie_id)
     data = requests.get(url)
     data = data.json()
     poster_path = data['poster_path']
     full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
-    return full_path
+    return full_path 
+"""
+def fetch_poster(movie_id):
+    try:
+        
+        url = "https://api.themoviedb.org/3/movie/{}?api_key=b029056b23ab082b8613c7aec5ecb0ec&language=en-US".format(movie_id)
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+
+        data = response.json()
+
+        if 'poster_path' in data:
+            poster_path = data['poster_path']
+            full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
+            return full_path
+        else:
+            return "Poster path not available for this movie."
 
 def recommend(movie):
     index = movies[movies['title'] == movie].index[0]
