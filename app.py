@@ -21,13 +21,17 @@ def fetch_poster(movie_id):
     full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
     return full_path 
 """
+
+
 def fetch_poster(movie_id):
     try:
-        
         url = "https://api.themoviedb.org/3/movie/{}?api_key=b029056b23ab082b8613c7aec5ecb0ec&language=en-US".format(movie_id)
+
+        # Make API request
         response = requests.get(url)
         response.raise_for_status()  # Raise an HTTPError for bad responses
 
+        # Parse JSON data
         data = response.json()
 
         if 'poster_path' in data:
@@ -36,6 +40,16 @@ def fetch_poster(movie_id):
             return full_path
         else:
             return "Poster path not available for this movie."
+
+    except requests.exceptions.RequestException as e:
+        return f"Request failed: {e}"
+
+    except KeyError as e:
+        return f"KeyError: {e}. Unable to retrieve poster path from the response."
+
+    except Exception as e:
+        return f"An unexpected error occurred: {e}"
+   
 
 def recommend(movie):
     index = movies[movies['title'] == movie].index[0]
