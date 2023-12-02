@@ -32,7 +32,6 @@ def fetch_poster(movie_id):
 
     except requests.exceptions.HTTPError as http_err:
         if response.status_code == 404:
-            st.warning(f"Movie with ID {movie_id} not found.")
             return None
         else:
             st.error(f"HTTP Error: {response.status_code} - {http_err}")
