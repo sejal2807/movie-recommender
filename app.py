@@ -12,28 +12,18 @@ streamlit_style = """
 			</style>
 			"""
 st.markdown(streamlit_style, unsafe_allow_html=True)
-"""
-def fetch_poster(movie_id):
-    url = "https://api.themoviedb.org/3/movie/{}?api_key=b029056b23ab082b8613c7aec5ecb0ec&language=en-US".format(movie_id)
-    data = requests.get(url)
-    data = data.json()
-    poster_path = data['poster_path']
-    full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
-    return full_path 
-"""
 
+import requests
 
 def fetch_poster(movie_id):
     try:
         url = "https://api.themoviedb.org/3/movie/{}?api_key=b029056b23ab082b8613c7aec5ecb0ec&language=en-US".format(movie_id)
-
-        # Make API request
         response = requests.get(url)
         response.raise_for_status()  # Raise an HTTPError for bad responses
 
-        # Parse JSON data
         data = response.json()
-
+        
+        # Check if 'poster_path' is present in the response
         if 'poster_path' in data:
             poster_path = data['poster_path']
             full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
@@ -41,15 +31,18 @@ def fetch_poster(movie_id):
         else:
             return "Poster path not available for this movie."
 
-    except requests.exceptions.RequestException as e:
-        return f"Request failed: {e}"
+    except requests.exceptions.HTTPError as http_err:
+        if response.status_code == 404:
+            return f"Movie with ID {movie_id} not found. API response: {response.text}"
+        else:
+            return f"HTTP Error: {response.status_code} - {http_err}"
 
-    except KeyError as e:
-        return f"KeyError: {e}. Unable to retrieve poster path from the response."
+    except requests.exceptions.RequestException as req_err:
+        return f"Request Exception: {req_err}"
 
     except Exception as e:
         return f"An unexpected error occurred: {e}"
-   
+
 
 def recommend(movie):
     index = movies[movies['title'] == movie].index[0]
